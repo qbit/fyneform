@@ -24,6 +24,18 @@ type FormOpts interface {
 // MakeForm takes a struct and builds a set of Fyne form items from it. Types
 // will be matched to the nearest appropriate Item. For example a bool will
 // result in a widget.NewCheckWithData, string in a widgetNewEntryWIthData.
+//
+// Item names can be specified by taging struct members with 'fyneform'. Password fields
+// can be created by setting the 'fynetype' tag to 'password'.
+//
+// For example:
+//
+//    type test struct {
+//    	First  string `json:"first"`
+//    	Last   string `fyneform:"Last Name" json:"last"`
+//    	Pass   string `fyneform:"Passphrase" fynetype:"password" json:"pass"`
+//    	Enable bool   `fyneform:"Enable?"`
+//    }
 func MakeForm(st interface{}, opts FormOpts) (items []*widget.FormItem, err error) {
 	stVal := reflect.ValueOf(st)
 	strType := reflect.Indirect(stVal).Type()
@@ -55,7 +67,14 @@ func MakeForm(st interface{}, opts FormOpts) (items []*widget.FormItem, err erro
 			if s, ok := field.Addr().Interface().(*string); ok {
 				boundString := binding.BindString(s)
 
+				formType := v.Tag.Get("fynetype")
+
 				w := widget.NewEntryWithData(boundString)
+
+				if formType == "password" {
+					w.Password = true
+				}
+
 				name := v.Tag.Get("fyneform")
 				if name == "" {
 					name = v.Tag.Get("json")

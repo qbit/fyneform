@@ -19,7 +19,7 @@ import (
 type test struct {
 	First  string `json:"first"`
 	Last   string `fyneform:"Last Name" json:"last"`
-	Pass   string `fyneform:"Password" json:"pass"`
+	Pass   string `fyneform:"Passphrase" fynetype:"password" json:"pass"`
 	Enable bool   `fyneform:"Enable?"`
 }
 
